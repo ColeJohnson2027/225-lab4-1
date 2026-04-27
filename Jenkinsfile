@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'  
-        DOCKER_IMAGE = 'cithit/john2027'                                   //<-----change this to your MiamiID!
+        DOCKER_IMAGE = 'cithit/john2027'                                   
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/ColeJohnson2027/225-lab4-1.git'     //<-----change this to match this new repository!
-        KUBECONFIG = credentials('john2027-sp26')                           //<-----change this to match your kubernetes credentials (MiamiID-225)! 
+        GITHUB_URL = 'https://github.com/ColeJohnson2027/225-lab4-1.git'     
+        KUBECONFIG = credentials('john2027-sp26')                           
     }
 
     stages {
@@ -18,14 +18,42 @@ pipeline {
             }
         }
 
+        // New Stages Implemented to The Pipeline for 4.3
+
+        stage('Install Python Dependencies') {
+            steps {
+                sh 'python3 -m pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                sh 'PYTHONPATH=. python3 -m pytest'
+            }
+        }
+
+        stage('Security Scan with Bandit') {
+            steps {
+                sh 'python3 -m bandit -r . || true'
+            }
+        }
+
+        stage('Dependency Vulnerability Scan') {
+            steps {
+                sh 'python3 -m pip_audit -r requirements.txt || true'
+            }
+        }
+
+        // Normal Pipeline Before Any Changes
+
         stage('Build Docker Image') {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'roseaw-dockerhub') {
                         docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}")
+                    }
                 }
             }
-        }
         }
 
         stage('Push Docker Image') {
@@ -41,9 +69,7 @@ pipeline {
         stage('Deploy to Dev Environment') {
             steps {
                 script {
-                    // This sets up the Kubernetes configuration using the specified KUBECONFIG
                     def kubeConfig = readFile(KUBECONFIG)
-                    // This updates the deployment-dev.yaml to use the new image tag
                     sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
                     sh "kubectl apply -f deployment-dev.yaml"
                 }
@@ -60,7 +86,6 @@ pipeline {
     }
 
     post {
-
         success {
             slackSend color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
