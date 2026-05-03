@@ -18,7 +18,6 @@ pipeline {
             }
         }
 
-        // New Stages Implemented to The Pipeline for 4.3
 
         stage('Install Python Dependencies') {
             steps {
@@ -43,8 +42,6 @@ pipeline {
                 sh 'python3 -m pip_audit -r requirements.txt || true'
             }
         }
-
-        // Normal Pipeline Before Any Changes
 
         stage('Build Docker Image') {
             steps {
