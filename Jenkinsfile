@@ -76,6 +76,18 @@ pipeline {
             }
         }
         
+        stage('DAST Security Scan') {
+            steps {
+                    sh '''
+                    docker run --rm \
+                    -v $WORKSPACE:/workspace \
+                    -e BURP_START_URL=http://10.48.228.105 \
+                    -e BURP_REPORT_FILE_PATH=/workspace/dastardly-report.xml \
+                    public.ecr.aws/portswigger/dastardly:latest
+                    '''
+                 }
+            }
+        
         stage('Check Kubernetes Cluster') {
             steps {
                 script {
