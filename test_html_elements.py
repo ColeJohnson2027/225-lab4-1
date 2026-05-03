@@ -13,16 +13,14 @@ class TestH5Tag(unittest.TestCase):
         firefox_options.add_argument("--disable-dev-shm-usage")
         self.driver = webdriver.Firefox(options=firefox_options)
 
-    def test_h5_tag_content(self):
+    def test_header_exists(self):
         driver = self.driver
-        driver.get("http://10.48.229.168")  # Replace with your target website (cluster IP!)
-        
-        # Locate the <h5> tag and get its text
-        h5_text = driver.find_element(By.TAG_NAME, "h5").text
-        
-        # Assert that the text of the <h5> tag is "Lab 3-6 Works!"
-        self.assertEqual("Lab 3-6 Works!", h5_text, "The <h5> tag does not contain the text 'Lab 3-6 Works!'")
+        driver.get("http://10.48.229.168")
 
+        header = driver.find_element(By.TAG_NAME, "h1").text
+        
+        self.assertIn("Database Table", header)
+    
     def tearDown(self):
         self.driver.quit()
 
