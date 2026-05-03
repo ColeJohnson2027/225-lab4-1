@@ -17,9 +17,9 @@ class TestH5Tag(unittest.TestCase):
         driver = self.driver
         driver.get("http://10.48.229.168")
 
-        header = driver.find_element(By.TAG_NAME, "h1").text
+        header = driver.find_element(By.TAG_NAME, "h2").text
         
-        self.assertIn("Database Table", header)
+        self.assertIn("Add Contact", header)
     
     def tearDown(self):
         self.driver.quit()
