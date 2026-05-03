@@ -15,7 +15,7 @@ class TestH5Tag(unittest.TestCase):
 
     def test_header_exists(self):
         driver = self.driver
-        driver.get("http://10.48.228.105")
+        driver.get("http://10.48.229.168")
 
         header = driver.find_element(By.TAG_NAME, "h1").text
         
